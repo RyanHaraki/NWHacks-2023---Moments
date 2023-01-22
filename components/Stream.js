@@ -1,9 +1,9 @@
 import { Player, useCreateStream } from "@livepeer/react";
-import { setRequestMeta } from "next/dist/server/request-meta";
-
 import { useMemo, useState, useEffect } from "react";
+import { createNewStream } from "@/lib/db";
 
 const VideoStream = ({ setStream }) => {
+  const [owner, setOwner] = useState(localStorage.getItem("address"));
   const [streamName, setStreamName] = useState("");
   const {
     mutate: createStream,
@@ -14,7 +14,12 @@ const VideoStream = ({ setStream }) => {
   const isLoading = useMemo(() => status === "loading", [status]);
 
   useEffect(() => {
+    // add the stream data to the database
     setStream(stream);
+
+    if (stream?.playbackId) {
+      createNewStream(owner, stream?.id, stream?.playbackId);
+    }
   }, [stream]);
 
   return (
@@ -25,7 +30,7 @@ const VideoStream = ({ setStream }) => {
           playbackId={stream?.playbackId}
           autoPlay
           muted
-          className="rounded"
+          className="rounded-md"
         />
       ) : (
         <Player />

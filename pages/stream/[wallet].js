@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import VideoStream from "@/components/Stream";
 import WidgetBot from "@widgetbot/react-embed";
 import Modal from "@/components/ui/Modal";
+import { Player } from "@livepeer/react";
 
 const Stream = () => {
   const [wallet, setWallet] = useState("");
@@ -57,9 +58,10 @@ const Stream = () => {
                   onClick={() => setModal(true)}
                   className="text-blue-400 cursor-pointer hover:underline"
                 >
-                  Click here
+                  Click here to learn how.
                 </span>
               </p>
+              <p>Click on either value to copy:</p>
               <ul>
                 <li>
                   <b>RTMP URL: </b>
@@ -104,7 +106,27 @@ const Stream = () => {
     return (
       <>
         {/* Stream and chat */}
-        <div></div>
+
+        <div className="flex w-full justify-between">
+          <div className="w-3/5">
+            <h1 className="font-bold text-2xl mb-2">{stream?.name}</h1>
+            <Player
+              title={stream?.name}
+              playbackId={stream?.playbackId}
+              autoPlay
+              className="rounded-md"
+            />
+          </div>
+          {ready && (
+            <WidgetBot
+              server="1066511643237941288"
+              channel="1066511643237941291"
+              width="400"
+              height="600"
+              options="notifications?: true"
+            />
+          )}
+        </div>
       </>
     );
   };
