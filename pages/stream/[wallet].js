@@ -4,6 +4,10 @@ import VideoStream from "@/components/Stream";
 import WidgetBot from "@widgetbot/react-embed";
 import Modal from "@/components/ui/Modal";
 import { Player } from "@livepeer/react";
+import {getStream, updateStream} from "@/lib/db";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { arrayUnion } from "firebase/firestore"
 
 const Stream = () => {
   const [wallet, setWallet] = useState("");
@@ -12,21 +16,50 @@ const Stream = () => {
   const [stream, setStream] = useState(null);
   const [modal, setModal] = useState(false);
 
+  const { address, isConnected } = useAccount();
+
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect( () => {
+
     setWallet(localStorage.getItem("address"));
 
     if (wallet === router.query.wallet) {
       setOwner(true);
     }
+
   }, []);
 
   useEffect(() => {
+    if (!router.isReady) return;
     setReady(true);
+
+    if (!owner) {
+      console.log(router.query.wallet);
+      getStream(router.query.wallet).then(res => setStream(res))
+    }
+
+    if (owner) {
+      getStream(router.query.wallet).then(res => {
+        if (!res) return;
+
+        if (res.owner === router.query.wallet) {
+          setStream(res)
+        }
+      })
+    }
   }, [router.isReady]);
 
-  //  starty/stop stream, airdrop, view chat
+  useEffect(() => {
+    if (!address) return;
+    if (!owner) {
+      updateStream(router.query.wallet, {
+        viewers: arrayUnion(address)
+      })
+    }
+  }, [isConnected])
+
+  //  start/stop stream, airdrop, view chat
   const renderOwner = () => {
     return (
       <>
@@ -106,7 +139,6 @@ const Stream = () => {
     return (
       <>
         {/* Stream and chat */}
-
         <div className="flex w-full justify-between">
           <div className="w-3/5">
             <h1 className="font-bold text-2xl mb-2">{stream?.name}</h1>
@@ -126,6 +158,10 @@ const Stream = () => {
               options="notifications?: true"
             />
           )}
+        </div>
+        <div className="mt-4">
+          <h1 className="text-xl font-bold">Connect your wallet to qualify for airdrops</h1>
+          <ConnectButton />
         </div>
       </>
     );

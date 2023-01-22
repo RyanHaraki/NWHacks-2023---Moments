@@ -18,7 +18,7 @@ const VideoStream = ({ setStream }) => {
     setStream(stream);
 
     if (stream?.playbackId) {
-      createNewStream(owner, stream?.id, stream?.playbackId);
+      createNewStream(owner, stream?.id, stream?.playbackId, stream?.name, stream?.streamKey);
     }
   }, [stream]);
 
