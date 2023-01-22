@@ -8,7 +8,7 @@
   - token creation
   - token airdrops to wallets of viewers
     - NFT/maybe ERC20
-- inventory page (Scott)
+- inventory page
 
 /
 /stream/<wallet> --> if (user.wallet === <wallet> then render as their page)
