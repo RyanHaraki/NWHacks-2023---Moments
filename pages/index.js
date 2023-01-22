@@ -25,7 +25,8 @@ export default function Home() {
         <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
       </Head>
       <main className="flex space-y-5 flex-col items-center justify-center h-screen bg-black">
-        <h1 className="text-5xl font-extrabold text-white">Moments</h1>
+        {/* <h1 className="text-5xl font-extrabold text-white">Moments</h1> */}
+        <img src="/moments-logo.svg" width="300" height="100" />
         <h5 className="text-lg text-white">
           Connect your Wallet to start streaming
         </h5>

@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import VideoStream from "@/components/Stream";
 import WidgetBot from "@widgetbot/react-embed";
+import Modal from "@/components/ui/Modal";
 
 const Stream = () => {
   const [wallet, setWallet] = useState("");
   const [owner, setOwner] = useState(false);
   const [ready, setReady] = useState(false);
+  const [stream, setStream] = useState(null);
+  const [modal, setModal] = useState(false);
 
   const router = useRouter();
 
@@ -27,9 +30,11 @@ const Stream = () => {
     return (
       <>
         {/* Stream and chat */}
+        <Modal open={modal} setOpen={setModal} />
         <div className="flex w-full justify-between">
           <div className="w-3/5">
-            <VideoStream />
+            <h1 className="font-bold text-2xl mb-2">{stream?.name}</h1>
+            <VideoStream setStream={setStream} />
           </div>
           {ready && (
             <WidgetBot
@@ -44,6 +49,51 @@ const Stream = () => {
         {/* Management stuff */}
         <div className="mt-4">
           <h1 className="font-bold text-2xl">Manage your Stream</h1>
+          {stream && (
+            <div>
+              <p>
+                Not sure how to stream from OBS?{" "}
+                <span
+                  onClick={() => setModal(true)}
+                  className="text-blue-400 cursor-pointer hover:underline"
+                >
+                  Click here
+                </span>
+              </p>
+              <ul>
+                <li>
+                  <b>RTMP URL: </b>
+                  <span
+                    onClick={async () => {
+                      console.log(stream.streamKey);
+                      await navigator.clipboard.writeText(
+                        "rtmp://rtmp.livepeer.com/live"
+                      );
+
+                      alert("RTMP URL copied to clipboard!");
+                    }}
+                    className="cursor-pointer hover:text-blue-400 hover:underline transition"
+                  >
+                    rtmp://rtmp.livepeer.com/live
+                  </span>
+                </li>
+                <li>
+                  <b>Your Stream Key: </b>
+                  <span
+                    onClick={async () => {
+                      console.log(stream.streamKey);
+                      await navigator.clipboard.writeText(stream?.streamKey);
+
+                      alert("Stream key copied to clipboard!");
+                    }}
+                    className="cursor-pointer hover:text-blue-400 hover:underline transition"
+                  >
+                    {stream?.streamKey}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </>
     );
@@ -67,3 +117,6 @@ const Stream = () => {
 };
 
 export default Stream;
+// {stream.rtmpIngestUrl}
+//          {stream.streamKey}
+//         {stream.playbackId}

@@ -1,8 +1,9 @@
 import { Player, useCreateStream } from "@livepeer/react";
+import { setRequestMeta } from "next/dist/server/request-meta";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
-const VideoStream = () => {
+const VideoStream = ({ setStream }) => {
   const [streamName, setStreamName] = useState("");
   const {
     mutate: createStream,
@@ -12,6 +13,10 @@ const VideoStream = () => {
 
   const isLoading = useMemo(() => status === "loading", [status]);
 
+  useEffect(() => {
+    setStream(stream);
+  }, [stream]);
+
   return (
     <div className="w-full h-full">
       {stream?.playbackId ? (
@@ -20,11 +25,11 @@ const VideoStream = () => {
           playbackId={stream?.playbackId}
           autoPlay
           muted
+          className="rounded"
         />
       ) : (
         <Player />
       )}
-      {/*  */}
 
       <div className="mt-4 flex  space-x-2">
         {!stream && (

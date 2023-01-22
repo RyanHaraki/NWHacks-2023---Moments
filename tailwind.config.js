@@ -27,6 +27,7 @@ module.exports = {
         blue: {
           10: "#3574f4",
         },
+        primary: "#FC3DD2",
       },
     },
   },
