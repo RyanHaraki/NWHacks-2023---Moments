@@ -4,10 +4,11 @@ import VideoStream from "@/components/Stream";
 import WidgetBot from "@widgetbot/react-embed";
 import Modal from "@/components/ui/Modal";
 import { Player } from "@livepeer/react";
-import {getStream, updateStream} from "@/lib/db";
+import { getStream, updateStream } from "@/lib/db";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
-import { arrayUnion } from "firebase/firestore"
+import { arrayUnion } from "firebase/firestore";
+import { useContract } from "@thirdweb-dev/react";
 
 const Stream = () => {
   const [wallet, setWallet] = useState("");
@@ -17,17 +18,19 @@ const Stream = () => {
   const [modal, setModal] = useState(false);
 
   const { address, isConnected } = useAccount();
+  const { contract } = useContract(
+    "0x4f1dD655148Ef3c118252622ef1D0aA621F63c59",
+    "nft-drop"
+  );
 
   const router = useRouter();
 
-  useEffect( () => {
-
+  useEffect(() => {
     setWallet(localStorage.getItem("address"));
 
     if (wallet === router.query.wallet) {
       setOwner(true);
     }
-
   }, []);
 
   useEffect(() => {
@@ -36,17 +39,17 @@ const Stream = () => {
 
     if (!owner) {
       console.log(router.query.wallet);
-      getStream(router.query.wallet).then(res => setStream(res))
+      getStream(router.query.wallet).then((res) => setStream(res));
     }
 
     if (owner) {
-      getStream(router.query.wallet).then(res => {
+      getStream(router.query.wallet).then((res) => {
         if (!res) return;
 
         if (res.owner === router.query.wallet) {
-          setStream(res)
+          setStream(res);
         }
-      })
+      });
     }
   }, [router.isReady]);
 
@@ -54,10 +57,31 @@ const Stream = () => {
     if (!address) return;
     if (!owner) {
       updateStream(router.query.wallet, {
-        viewers: arrayUnion(address)
-      })
+        viewers: arrayUnion(address),
+      });
     }
-  }, [isConnected])
+  }, [isConnected]);
+
+  const handleAirdrop = () => {
+    const quantity = 1;
+    const metadata = [
+      {
+        name: stream?.name,
+        description: `Your were a viewer of ${stream?.name}`,
+        image:
+          "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80", // This can be an image url or file
+      },
+    ];
+    contract.createBatch(metadata);
+
+    if (owner) {
+      stream.viewers.forEach(async (viewer) => {
+        const tx = await contract.claimTo(viewer, quantity);
+      });
+    }
+
+    alert("Airdrop sent to all viewers");
+  };
 
   //  start/stop stream, airdrop, view chat
   const renderOwner = () => {
@@ -127,6 +151,12 @@ const Stream = () => {
                   </span>
                 </li>
               </ul>
+              <button
+                className="mt-4 bg-blue-500 rounded-md p-2 text-white"
+                onClick={handleAirdrop}
+              >
+                Airdrop NFTs{" "}
+              </button>
             </div>
           )}
         </div>
@@ -160,7 +190,11 @@ const Stream = () => {
           )}
         </div>
         <div className="mt-4">
-          <h1 className="text-xl font-bold">Connect your wallet to qualify for airdrops</h1>
+          <h1 className="text-xl font-bold">
+            {isConnected
+              ? "Connect your wallet to qualify for airdrops"
+              : "You are qualified for airdrops!"}
+          </h1>
           <ConnectButton />
         </div>
       </>
@@ -175,6 +209,3 @@ const Stream = () => {
 };
 
 export default Stream;
-// {stream.rtmpIngestUrl}
-//          {stream.streamKey}
-//         {stream.playbackId}

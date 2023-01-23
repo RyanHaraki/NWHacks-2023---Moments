@@ -11,6 +11,8 @@ import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { ThirdwebSDKProvider, ChainId } from "@thirdweb-dev/react";
+const desiredChainId = ChainId.Mumbai;
 
 const { chains, provider } = configureChains(
   [mainnet, polygon, optimism, arbitrum],
@@ -39,12 +41,14 @@ const livepeerClient = createReactClient({
 
 export default function App({ Component, pageProps }) {
   return (
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <LivepeerConfig client={livepeerClient}>
-          <Component {...pageProps} />
-        </LivepeerConfig>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <ThirdwebSDKProvider desiredChainId={desiredChainId}>
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains}>
+          <LivepeerConfig client={livepeerClient}>
+            <Component {...pageProps} />
+          </LivepeerConfig>
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </ThirdwebSDKProvider>
   );
 }

@@ -18,7 +18,13 @@ const VideoStream = ({ setStream }) => {
     setStream(stream);
 
     if (stream?.playbackId) {
-      createNewStream(owner, stream?.id, stream?.playbackId, stream?.name, stream?.streamKey);
+      createNewStream(
+        owner,
+        stream?.id,
+        stream?.playbackId,
+        stream?.name,
+        stream?.streamKey
+      );
     }
   }, [stream]);
 
@@ -27,7 +33,7 @@ const VideoStream = ({ setStream }) => {
       {stream?.playbackId ? (
         <Player
           title={stream?.name}
-          playbackId={stream?.playbackId}
+          playbackId="8da36rolcf2zy77q"
           autoPlay
           muted
           className="rounded-md"
